@@ -1,3 +1,4 @@
+import random
 import pygame
 import math
 
@@ -225,6 +226,25 @@ def draw_directions(surface, constants):
         text = font.render(direction, True, constants["WHITE"])
         text_rect = text.get_rect(center=position)
         surface.blit(text, text_rect)
+
+def display_traffic_data(screen,traffic_data ):
+    """Displays traffic data for each road on the screen."""
+    font = pygame.font.Font(None, 28)
+    y_offset = 50
+    for road, count in traffic_data.items():
+        text = f"{road.capitalize()}: {count} vehicles"
+        text_surface = font.render(text, True, (0, 0, 0))
+        screen.blit(text_surface, (10, y_offset))
+        y_offset += 30
+
+def simulate_traffic_data():
+    """Simulates traffic data for each road.""" 
+    return {
+        "west": random.randint(0, 20),
+        "north": random.randint(0, 20),
+        "east": random.randint(0, 20),
+        "south": random.randint(0, 20)
+    }
 
 def draw_all(surface, constants):
     draw_intersection(surface, constants)
