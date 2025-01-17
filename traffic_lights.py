@@ -208,9 +208,28 @@ def draw_traffic_lights(surface, constants):
 
 # --- Main Drawing Function ---
 
+def draw_directions(surface, constants):
+    """Draws direction labels for each road."""
+    font = pygame.font.Font(None, 36)  # Set the font and size
+
+    # Define the positions for the labels
+    directions = {
+        "North": (constants["INTERSECTION_X1"] + constants["ROAD_WIDTH_V"] // 2, constants["INTERSECTION_Y1"] - 300),
+        "South": (constants["INTERSECTION_X1"] + constants["ROAD_WIDTH_V"] // 2, constants["INTERSECTION_Y2"] + 300),
+        "West": (constants["INTERSECTION_X1"] - 300, constants["INTERSECTION_Y1"] + constants["ROAD_WIDTH_H"] // 5),
+        "East": (constants["INTERSECTION_X2"] + 300, constants["INTERSECTION_Y1"] + constants["ROAD_WIDTH_H"] // 5),
+    }
+
+    # Draw the labels on the surface
+    for direction, position in directions.items():
+        text = font.render(direction, True, constants["WHITE"])
+        text_rect = text.get_rect(center=position)
+        surface.blit(text, text_rect)
+
 def draw_all(surface, constants):
     draw_intersection(surface, constants)
     draw_horizontal_lanes(surface, constants)
     draw_vertical_lanes(surface, constants)
     draw_dividers(surface, constants)
     draw_traffic_lights(surface, constants)
+    draw_directions(surface, constants)  # Add this line to include directional labels
