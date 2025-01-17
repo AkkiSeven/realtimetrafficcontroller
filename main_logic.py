@@ -2,7 +2,7 @@ import pygame
 import sys
 import math
 import os
-from traffic_lights import initialize_screen, draw_all
+from traffic_lights import draw_vehicle_counts, initialize_screen, draw_all
 from traditional_traffic_module import draw_traffic_lights_with_state, update_traffic_system
 from intelligent_traffic_module import simulate_traffic_data, update_traffic_intelligently, display_traffic_data
 
@@ -156,6 +156,7 @@ def main():
             timer_rect = timer_text.get_rect(topleft=(10, 10))
             screen.blit(timer_text, timer_rect)
             display_traffic_data(screen, traffic_data,constants)
+            draw_vehicle_counts(screen, traffic_data,constants)
             draw_traffic_lights_with_state(screen, constants, traffic_lights)
 
         
