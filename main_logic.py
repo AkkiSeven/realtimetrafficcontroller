@@ -4,6 +4,7 @@ import math
 import os
 from traffic_lights import initialize_screen, draw_all
 from traditional_traffic_module import draw_traffic_lights_with_state, update_traffic_system
+from intelligent_traffic_module import simulate_traffic_data, update_traffic_intelligently, display_traffic_data
 
 
 class Button:
@@ -118,7 +119,10 @@ def main():
                     traffic_lights = update_traffic_system(traffic_lights, road_order, current_road_index)
                 elif intelligent_button.check_click(mouse_pos):
                     print("Intelligent Button Clicked")
-                    active_system = None # To stop the traditional system
+                    active_system = "intelligent"
+                    countdown_start_time = pygame.time.get_ticks()
+                    traffic_data = simulate_traffic_data()
+                    traffic_lights = update_traffic_intelligently(traffic_lights, traffic_data) # To stop the traditional system
 
         # Draw the traffic system
         screen.fill((232, 255, 239))
@@ -138,6 +142,22 @@ def main():
           timer_rect = timer_text.get_rect(topleft=(10,10))
           screen.blit(timer_text, timer_rect)
           draw_traffic_lights_with_state(screen, constants, traffic_lights)
+        elif active_system == "intelligent":
+
+            elapsed_time = pygame.time.get_ticks() - countdown_start_time
+            remaining_time = max(0, countdown_duration - elapsed_time)
+            if remaining_time <= 0:
+                traffic_data = simulate_traffic_data()
+                traffic_lights = update_traffic_intelligently(traffic_lights, traffic_data)
+                countdown_start_time = pygame.time.get_ticks()
+
+            font = pygame.font.Font(None, 36)
+            timer_text = font.render(f"Intelligent Mode Active", True, (0, 0, 0))
+            timer_rect = timer_text.get_rect(topleft=(10, 10))
+            screen.blit(timer_text, timer_rect)
+            display_traffic_data(screen, traffic_data,constants)
+            draw_traffic_lights_with_state(screen, constants, traffic_lights)
+
         
         else: # if no traffic is enabled, use default light colors for all
             traffic_lights = {"west": "red", "north": "red", "east": "red", "south": "red"}
