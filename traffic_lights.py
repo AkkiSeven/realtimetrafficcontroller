@@ -288,5 +288,5 @@ def display_comparison(screen, traditional_count, intelligent_count):
     traditional_surface = font.render(traditional_text, True, (0, 0, 0))
     intelligent_surface = font.render(intelligent_text, True, (0, 0, 0))
 
-    screen.blit(traditional_surface, (1500, 800))  # Display traditional count
-    screen.blit(intelligent_surface, (1500, 825))  # Display intelligent count
+    screen.blit(traditional_surface, (1000, 250))  # Display traditional count
+    screen.blit(intelligent_surface, (1000, 275))  # Display intelligent count
