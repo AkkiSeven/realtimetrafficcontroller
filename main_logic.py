@@ -2,9 +2,9 @@ import pygame
 import sys
 import math
 import os
-from traffic_lights import draw_vehicle_counts, initialize_screen, draw_all
-from traditional_traffic_module import draw_traffic_lights_with_state, update_traffic_system
-from intelligent_traffic_module import simulate_traffic_data, update_traffic_intelligently, display_traffic_data
+from traffic_lights import draw_vehicle_counts, initialize_screen, draw_all,display_traffic_data
+from traditional_traffic_module import draw_traffic_lights_with_state 
+from intelligent_traffic_module import simulate_traffic_data, update_traffic_intelligently 
 
 
 class Button:
@@ -100,6 +100,11 @@ def main():
       traffic_lights[road_order[road_index]] = "green"
       return traffic_lights
 
+    countdown_start_time = 0
+    last_traffic_data_update = 0  # Time when traffic data was last updated
+    traffic_data_update_interval = 10 * 1000  # 10 seconds in milliseconds
+    traffic_data = simulate_traffic_data()  # Initial traffic data
+
     running = True
     while running:
         for event in pygame.event.get():
@@ -129,6 +134,13 @@ def main():
         draw_all(screen, constants)
         
         # Draw timer if traditional system is active
+
+        # Refresh traffic data every 10 seconds
+        current_time = pygame.time.get_ticks()
+        if current_time - last_traffic_data_update >= traffic_data_update_interval:
+          traffic_data = simulate_traffic_data()
+          last_traffic_data_update = current_time
+
         if active_system == "traditional":
           elapsed_time = pygame.time.get_ticks() - countdown_start_time
           remaining_time = max(0, countdown_duration - elapsed_time) # Remaining time
@@ -141,13 +153,14 @@ def main():
           timer_text = font.render(f"Time Remaining: {remaining_time // 1000 + 1}", True, (0, 0, 0))
           timer_rect = timer_text.get_rect(topleft=(10,10))
           screen.blit(timer_text, timer_rect)
+          display_traffic_data(screen, traffic_data,constants)
+          draw_vehicle_counts(screen, traffic_data,constants)
           draw_traffic_lights_with_state(screen, constants, traffic_lights)
         elif active_system == "intelligent":
 
             elapsed_time = pygame.time.get_ticks() - countdown_start_time
             remaining_time = max(0, countdown_duration - elapsed_time)
             if remaining_time <= 0:
-                traffic_data = simulate_traffic_data()
                 traffic_lights = update_traffic_intelligently(traffic_lights, traffic_data)
                 countdown_start_time = pygame.time.get_ticks()
 

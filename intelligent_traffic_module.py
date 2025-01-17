@@ -23,12 +23,3 @@ def update_traffic_intelligently(traffic_lights, traffic_data):
 
     return traffic_lights
 
-def display_traffic_data(screen, traffic_data, constants):
-    """Displays traffic data for each road on the screen."""
-    font = pygame.font.Font(None, 28)
-    y_offset = 50
-    for road, count in traffic_data.items():
-        text = f"{road.capitalize()}: {count} vehicles"
-        text_surface = font.render(text, True, (0, 0, 0))
-        screen.blit(text_surface, (10, y_offset))
-        y_offset += 30

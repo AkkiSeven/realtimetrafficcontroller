@@ -234,10 +234,10 @@ def draw_vehicle_counts(surface, traffic_data, constants):
 
     # Define the positions for the labels
     directions = {
-        "North": (constants["INTERSECTION_X1"] + constants["ROAD_WIDTH_V"] // 2, constants["INTERSECTION_Y1"] - 100),
-        "South": (constants["INTERSECTION_X1"] + constants["ROAD_WIDTH_V"] // 2, constants["INTERSECTION_Y2"] + 100),
-        "West": (constants["INTERSECTION_X1"] - 300, constants["INTERSECTION_Y1"] + constants["ROAD_WIDTH_H"] // 4),
-        "East": (constants["INTERSECTION_X2"] + 300, constants["INTERSECTION_Y1"] + constants["ROAD_WIDTH_H"] // 4),
+        "North": (constants["INTERSECTION_X1"] + constants["ROAD_WIDTH_V"] // 3, constants["INTERSECTION_Y1"] - 250),
+        "South": (constants["INTERSECTION_X1"] + constants["ROAD_WIDTH_V"] // 3, constants["INTERSECTION_Y2"] + 250),
+        "West": (constants["INTERSECTION_X1"] - 300, constants["INTERSECTION_Y1"] + constants["ROAD_WIDTH_H"] // 3.5),
+        "East": (constants["INTERSECTION_X2"] + 300, constants["INTERSECTION_Y1"] + constants["ROAD_WIDTH_H"] // 3.5),
     }
 
     # Draw the labels on the surface
@@ -249,27 +249,6 @@ def draw_vehicle_counts(surface, traffic_data, constants):
         surface.blit(text, text_rect)
         surface.blit(text, text_rect)
 
-
-def draw_vehicle_counts_old(surface,  traffic_data, constants):
-    """
-    Draws the number of vehicles on the respective roads based on simulated traffic data.
-    """
-    font = pygame.font.Font(None, 28)  # Font for the vehicle count
-
-    # Define positions to display vehicle counts
-    positions = {
-        "North": (constants["INTERSECTION_X1"] + constants["ROAD_WIDTH_V"] // 5, constants["INTERSECTION_Y1"] - 100),
-        "South": (constants["INTERSECTION_X1"] + constants["ROAD_WIDTH_V"] // 5, constants["INTERSECTION_Y2"] + 100),
-        "West": (constants["INTERSECTION_X1"] - 200, constants["INTERSECTION_Y1"] + constants["ROAD_WIDTH_H"] // 5),
-        "East": (constants["INTERSECTION_X2"] + 200, constants["INTERSECTION_Y1"] + constants["ROAD_WIDTH_H"] // 5),
-    }
-
-    # Render and draw the vehicle count for each direction
-    for direction, count in traffic_data.items():
-        text = f"{count} vehicles"
-        text_surface = font.render(text, True, constants["WHITE"])
-        text_rect = text_surface.get_rect(center=positions[direction])
-        surface.blit(text_surface, text_rect)
 
 def simulate_traffic_data():
     """Simulates traffic data for each road.""" 
@@ -287,3 +266,14 @@ def draw_all(surface, constants):
     draw_dividers(surface, constants)
     draw_traffic_lights(surface, constants)
     draw_directions(surface, constants)  # Add this line to include directional labels
+
+
+def display_traffic_data(screen, traffic_data, constants):
+    """Displays traffic data for each road on the screen."""
+    font = pygame.font.Font(None, 28)
+    y_offset = 50
+    for road, count in traffic_data.items():
+        text = f"{road.capitalize()}: {count} vehicles"
+        text_surface = font.render(text, True, (0, 0, 0))
+        screen.blit(text_surface, (10, y_offset))
+        y_offset += 30
