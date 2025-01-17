@@ -277,3 +277,16 @@ def display_traffic_data(screen, traffic_data, constants):
         text_surface = font.render(text, True, (0, 0, 0))
         screen.blit(text_surface, (10, y_offset))
         y_offset += 30
+
+
+def display_comparison(screen, traditional_count, intelligent_count):
+    """Displays vehicle counts for both systems."""
+    font = pygame.font.Font(None, 28)
+    traditional_text = f"Traditional System: {traditional_count} vehicles passed"
+    intelligent_text = f"Intelligent System: {intelligent_count} vehicles passed"
+
+    traditional_surface = font.render(traditional_text, True, (0, 0, 0))
+    intelligent_surface = font.render(intelligent_text, True, (0, 0, 0))
+
+    screen.blit(traditional_surface, (1500, 800))  # Display traditional count
+    screen.blit(intelligent_surface, (1500, 825))  # Display intelligent count

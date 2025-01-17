@@ -2,10 +2,11 @@ import pygame
 import sys
 import math
 import os
-from traffic_lights import draw_vehicle_counts, initialize_screen, draw_all,display_traffic_data
+from traffic_lights import display_comparison, draw_vehicle_counts, initialize_screen, draw_all,display_traffic_data
 from traditional_traffic_module import draw_traffic_lights_with_state 
 from intelligent_traffic_module import simulate_traffic_data, update_traffic_intelligently 
 
+# Traffic states
 
 class Button:
     def __init__(self, x, y, width, height, text, font_path, color, hover_color, border_radius=5):
@@ -48,6 +49,8 @@ class Button:
     def check_click(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
 
+
+    
 def main():
     screen, constants = initialize_screen(screen_caption="AI Traffic Simulation")
 
@@ -105,8 +108,18 @@ def main():
     traffic_data_update_interval = 10 * 1000  # 10 seconds in milliseconds
     traffic_data = simulate_traffic_data()  # Initial traffic data
 
+    traffic_lights_traditional = {"west": "red", "north": "red", "east": "red", "south": "red"}
+    traffic_lights_intelligent = {"west": "red", "north": "red", "east": "red", "south": "red"}
+
+    # Vehicle counters
+    vehicles_passed_traditional = 0
+    vehicles_passed_intelligent = 0
+
+
     running = True
+    start = False
     while running:
+      
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -122,53 +135,71 @@ def main():
                     countdown_start_time = pygame.time.get_ticks()
                     current_road_index = 0
                     traffic_lights = update_traffic_system(traffic_lights, road_order, current_road_index)
+                    start=True
                 elif intelligent_button.check_click(mouse_pos):
                     print("Intelligent Button Clicked")
                     active_system = "intelligent"
                     countdown_start_time = pygame.time.get_ticks()
-                    traffic_data = simulate_traffic_data()
                     traffic_lights = update_traffic_intelligently(traffic_lights, traffic_data) # To stop the traditional system
+                    start=True
+
+   
+    
 
         # Draw the traffic system
         screen.fill((232, 255, 239))
         draw_all(screen, constants)
+
         
         # Draw timer if traditional system is active
 
         # Refresh traffic data every 10 seconds
-        current_time = pygame.time.get_ticks()
-        if current_time - last_traffic_data_update >= traffic_data_update_interval:
-          traffic_data = simulate_traffic_data()
-          last_traffic_data_update = current_time
+        elapsed_time = pygame.time.get_ticks() - countdown_start_time
+        remaining_time = max(0, countdown_duration - elapsed_time) # Remaining time
+        if remaining_time <=0:
+           if start == True: 
+                vehicles_passed_traditional += traffic_data[road_order[current_road_index]]
+                traffic_lights_traditional = update_traffic_system(
+                    traffic_lights_traditional, road_order, current_road_index
+                )
+                traffic_lights_intelligent = update_traffic_intelligently(
+                    traffic_lights_intelligent, traffic_data
+                )
+                for road, light in traffic_lights_intelligent.items():
+                    print("intelligent")
+                    print(traffic_data)
+                    print(road)
+                    print(light)
+                    if light == "green":
+                        print("for green")
+                        print(traffic_data[road])
+                        vehicles_passed_intelligent += traffic_data[road]
+                
+
+           traffic_lights = update_traffic_system(traffic_lights, road_order, current_road_index)
+           countdown_start_time = pygame.time.get_ticks()
+           current_road_index = (current_road_index+1) % 4 # Reset timer and move to next road
+           traffic_data = simulate_traffic_data()
+ 
 
         if active_system == "traditional":
-          elapsed_time = pygame.time.get_ticks() - countdown_start_time
-          remaining_time = max(0, countdown_duration - elapsed_time) # Remaining time
           if remaining_time <=0:
-            current_road_index = (current_road_index+1) % 4 # Reset timer and move to next road
             traffic_lights = update_traffic_system(traffic_lights, road_order, current_road_index)
-            countdown_start_time = pygame.time.get_ticks()
-
+        
           font = pygame.font.Font(None, 36)
           timer_text = font.render(f"Time Remaining: {remaining_time // 1000 + 1}", True, (0, 0, 0))
           timer_rect = timer_text.get_rect(topleft=(10,10))
           screen.blit(timer_text, timer_rect)
-          display_traffic_data(screen, traffic_data,constants)
           draw_vehicle_counts(screen, traffic_data,constants)
           draw_traffic_lights_with_state(screen, constants, traffic_lights)
         elif active_system == "intelligent":
-
-            elapsed_time = pygame.time.get_ticks() - countdown_start_time
-            remaining_time = max(0, countdown_duration - elapsed_time)
             if remaining_time <= 0:
-                traffic_lights = update_traffic_intelligently(traffic_lights, traffic_data)
-                countdown_start_time = pygame.time.get_ticks()
+               traffic_lights = update_traffic_intelligently(traffic_lights, traffic_data)
 
             font = pygame.font.Font(None, 36)
             timer_text = font.render(f"Intelligent Mode Active", True, (0, 0, 0))
             timer_rect = timer_text.get_rect(topleft=(10, 10))
             screen.blit(timer_text, timer_rect)
-            display_traffic_data(screen, traffic_data,constants)
             draw_vehicle_counts(screen, traffic_data,constants)
             draw_traffic_lights_with_state(screen, constants, traffic_lights)
 
@@ -178,6 +209,8 @@ def main():
             draw_traffic_lights_with_state(screen, constants, traffic_lights)
 
 
+        display_traffic_data(screen, traffic_data,constants)
+        display_comparison(screen, vehicles_passed_traditional, vehicles_passed_intelligent)
         # Draw the buttons
         traditional_button.draw(screen)
         intelligent_button.draw(screen)
